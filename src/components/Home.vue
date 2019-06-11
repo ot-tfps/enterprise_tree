@@ -9,7 +9,6 @@
           <b-button block>作成</b-button>
         </b-col>
       </b-row>
-      
       <b-modal v-model="showModal">
         <template slot="modal-title">{{ modalTitle }}</template>
         <b-form-group label-for="inputname">
@@ -49,15 +48,13 @@
          </template>
       </b-modal>
     </div>
-    <div>
-      <ul v-for="data in treeData" id="tree">
-        <tree-item
-          class="item"
-          :item="data"
-          @add-item="addItem">
-        </tree-item>
-      </ul>
-    </div>
+    <ul v-for="data in treeData" id="tree">
+      <tree-item
+        class="item"
+        :item="data"
+        @add-item="addItem">
+      </tree-item>
+    </ul>
   </div>
 </template>
 
@@ -141,5 +138,7 @@ export default {
   border-radius :8px;
   box-shadow :0px 0px 5px silver;
   padding: 0.5em 0.5em 0.5em 2em;
+  margin: auto;
+  margin-top: 20px;
 }
 </style>
