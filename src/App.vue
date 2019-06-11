@@ -16,6 +16,10 @@ export default {
 </script>
 
 <style lang="scss">
+/* Import Font Awesome Icons Set */
+$fa-font-path: '~font-awesome/fonts/';
+@import '~font-awesome/scss/font-awesome.scss';
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -34,15 +38,13 @@ body {
 .bold {
   font-weight: bold;
 }
-
 ul {
-  list-style-type: dot;
+  list-style-type: none;
   text-align: left;
 }
 ul li, ol li {
   line-height: 1.5;
   padding: 0.5em 0;
 }
-
 
 </style>

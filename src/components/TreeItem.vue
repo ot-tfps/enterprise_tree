@@ -3,6 +3,10 @@
     <div
       :class="{bold: isFolder}"
       @click="toggle">
+      <i v-show="item.type==='op'" class="fa fa-address-book fa-sm"></i>
+      <i v-show="item.type==='mc'" class="fa fa-institution fa-sm"></i>
+      <i v-show="item.type==='st'" class="fa fa-building-o fa-sm"></i>
+      <i v-show="item.type==='tm'" class="fa fa-tablet fa-sm"></i>
       {{ item.id }} {{ item.id ? ':' : '' }} {{ item.name }} {{ item.type == 'tm' ? '台' : '' }}
       <span v-show="item.children != undefined">[ {{ isOpen ? '-' : '+' }} ]</span>
     </div>
