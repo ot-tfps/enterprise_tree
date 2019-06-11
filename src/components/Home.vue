@@ -1,25 +1,42 @@
 <template>
   <div>
     <div>
-      <b-button @click="showModal=true, itemType='op'">+ 事業者追加</b-button>
+      <b-button @click="addOperator()">+ 事業者追加</b-button>
       <b-modal v-model="showModal">
         <template slot="modal-title">{{ modalTitle }}</template>
+        
         <b-form-group label-for="inputname">
-          <b-form-radio-group id="inputname"
+          <b-form-radio-group
             :plain="true"
             :options="[
-              {text: '新規 ', value: '1'},
-              {text: '既存 ', value: '2'}
+              {text: '新規 ', value: true},
+              {text: '既存 ', value: false}
               ]"
-              :checked="3">
+            :checked="1"
+            v-model="isNew">
           </b-form-radio-group>
-          <b-form-input v-model="itemName"></b-form-input>
+          <b-form-group
+            label="ID"
+            label-for="id"
+            :label-cols="2">
+            <b-form-input id="id" v-model="itemId" v-bind:disabled="isNew"></b-form-input>
+          </b-form-group>
+          <b-form-group
+            label="名称"
+            label-for="name"
+            :label-cols="2">
+            <b-form-input id="name" v-model="itemName"></b-form-input>
+          </b-form-group>
           <div v-if="itemType === 'st'">
-            <b-form-group id="input-group-2" label="端末台数" label-for="input-2">
-              <b-form-input id="input-2" v-model="itemNum"></b-form-input>
+            <b-form-group
+              label="端末台数"
+              label-for="number"
+              :label-cols="2">
+              <b-form-input id="number" v-model="itemNum"></b-form-input>
             </b-form-group>
           </div>
         </b-form-group>
+        
          <template slot="modal-footer" slot-scope="{ ok, cancel }">
            <b-button size="sm" @click="cancel()">Cancel</b-button>
            <b-button size="sm" variant="primary" @click="add(), showModal=false">OK</b-button>
@@ -34,11 +51,14 @@
         @add-item="addItem">
       </tree-item>
     </ul>
+    
+    <b-button>作成</b-button>
   </div>
 </template>
 
 <script>
 import treeItem from './TreeItem.vue'
+import sampleData from '../sample_data.js'
 
 export default {
   name: 'tree',
@@ -46,15 +66,22 @@ export default {
   data: () => {
     return {
       showModal: false,
-      treeData: [],
+      treeData: sampleData,
+      isNew: true,
       itemName: '',
+      itemId: '',
       itemNum: '',
       itemType: '',
       item: Object,
-      modalTitle: '事業者登録'
+      modalTitle: ''
     }
   },
   methods: {
+    addOperator: function () {
+      this.modalTitle = "事業者登録"
+      this.itemType = 'op'
+      this.showModal = true
+    },
     addItem: function (item) {
       if (item.children == undefined) {
         this.$set(item, 'children', [])
@@ -76,30 +103,40 @@ export default {
       this.showModal = true
     },
     add: function () {
-      if (this.itemType === "op") {
-        this.treeData.push({name: this.itemName, type: this.itemType})
-      } else if (this.itemType === "st") {
+      var itemName = this.itemName
+      var itemId = this.itemId
+      var itemType = this.itemType
+      var itemNum = this.itemNum
+      
+      if (itemType === "op") {
+        this.treeData.push({
+          name: itemName, 
+          id: itemId,
+          type: itemType
+        })
+      } else if (itemType === "st") {
         this.item.children.push({
-          name: this.itemName,
-          type: this.itemType,
+          name: itemName,
+          id: itemId,
+          type: itemType,
           children: [{
-            name: this.itemNum,
+            name: itemNum,
             type: "tm"
             }]
         })
-
       } else {
         this.item.children.push({
-          name: this.itemName,
-          type: this.itemType
+          name: itemName,
+          id: itemId,
+          type: itemType
         })
-
       }
       this.clearItemName()
     },
     clearItemName: function () {
       this.itemName = ''
       this.itemNum = ''
+      this.itemId = ''
     }
   }
 }
