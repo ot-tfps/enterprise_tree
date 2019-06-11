@@ -103,33 +103,20 @@ export default {
       this.showModal = true
     },
     add: function () {
-      var itemName = this.itemName
-      var itemId = this.itemId
       var itemType = this.itemType
       var itemNum = this.itemNum
-      
+      var data = {
+        name: this.itemName, 
+        id: this.itemId,
+        type: this.itemType
+      }
       if (itemType === "op") {
-        this.treeData.push({
-          name: itemName, 
-          id: itemId,
-          type: itemType
-        })
+        this.treeData.push(data)
       } else if (itemType === "st") {
-        this.item.children.push({
-          name: itemName,
-          id: itemId,
-          type: itemType,
-          children: [{
-            name: itemNum,
-            type: "tm"
-            }]
-        })
+        data['children'] = [{name: itemNum, type: "tm"}]
+        this.item.children.push(data)
       } else {
-        this.item.children.push({
-          name: itemName,
-          id: itemId,
-          type: itemType
-        })
+        this.item.children.push(data)
       }
       this.clearItemName()
     },
