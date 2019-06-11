@@ -1,10 +1,17 @@
 <template>
   <div>
     <div>
-      <b-button @click="addOperator()">+ 事業者追加</b-button>
+      <b-row class="justify-content-center">
+        <b-col sm="4" md="2">
+          <b-button block @click="addOperator()">+ 事業者追加</b-button>
+        </b-col>
+        <b-col sm="4" md="2">
+          <b-button block>作成</b-button>
+        </b-col>
+      </b-row>
+      
       <b-modal v-model="showModal">
         <template slot="modal-title">{{ modalTitle }}</template>
-        
         <b-form-group label-for="inputname">
           <b-form-radio-group
             :plain="true"
@@ -36,23 +43,21 @@
             </b-form-group>
           </div>
         </b-form-group>
-        
          <template slot="modal-footer" slot-scope="{ ok, cancel }">
            <b-button size="sm" @click="cancel()">Cancel</b-button>
            <b-button size="sm" variant="primary" @click="add(), showModal=false">OK</b-button>
          </template>
       </b-modal>
     </div>
-
-    <ul v-for="data in treeData" id="tree">
-      <tree-item
-        class="item"
-        :item="data"
-        @add-item="addItem">
-      </tree-item>
-    </ul>
-    
-    <b-button>作成</b-button>
+    <div>
+      <ul v-for="data in treeData" id="tree">
+        <tree-item
+          class="item"
+          :item="data"
+          @add-item="addItem">
+        </tree-item>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -128,3 +133,13 @@ export default {
   }
 }
 </script>
+
+<style>
+#tree {
+  width: 500px;
+  background: #dadada;
+  border-radius :8px;
+  box-shadow :0px 0px 5px silver;
+  padding: 0.5em 0.5em 0.5em 2em;
+}
+</style>

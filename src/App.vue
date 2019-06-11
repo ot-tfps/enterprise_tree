@@ -34,11 +34,14 @@ body {
 .bold {
   font-weight: bold;
 }
+
 ul {
-  padding-left: 1em;
-  line-height: 1.5em;
   list-style-type: dot;
   text-align: left;
+}
+ul li, ol li {
+  line-height: 1.5;
+  padding: 0.5em 0;
 }
 
 
