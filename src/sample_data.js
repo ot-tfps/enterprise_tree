@@ -4,33 +4,23 @@ export default
     name: '株式会社出雲',
     id: 12345,
     type: 'op',
-    children: [
+    merchants: [
       {
         name: 'イズモスポーツ',
         id: 2345,
         type: 'mc',
-        children: [
+        stores: [
           {
             name: '表参道店',
             id: 987,
             type: 'st',
-            children: [
-              {
-                name: '3',
-                type: 'tm'
-              }
-            ]
+            terminals: '3'
           },
           {
             name: '上野店',
             id: 876,
             type: 'st',
-            children: [
-              {
-                name: '4',
-                type: 'tm'
-              }
-            ]
+            terminals: '4'
           }
         ]
       },
@@ -38,26 +28,16 @@ export default
         name: 'Gym IZUMO',
         id: 3456,
         type: 'mc',
-        children: [
+        stores: [
           {
             name: 'Gym IZUMO 池袋',
             type: 'st',
-            children: [
-              {
-                name: '2',
-                type: 'tm'
-              }
-            ]
+            terminals: '2'
           },
           {
             name: 'Gym IZUMO 大宮',
             type: 'st',
-            children: [
-              {
-                name: '2',
-                type: 'tm'
-              }
-            ]
+            terminals: '2'
           }
         ]
       }
@@ -66,20 +46,15 @@ export default
   {
     name: 'アリエス',
     type: 'op',
-    children: [
+    merchants: [
       {
         name: 'スーパー荒川',
         type: 'mc',
-        children: [
+        stores: [
           {
             name: '青砥店',
             type: 'st',
-            children: [
-              {
-                name: '8',
-                type: 'tm'
-              }
-            ]
+            terminals: '8'
           }
         ]
       }

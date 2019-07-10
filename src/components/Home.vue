@@ -48,7 +48,7 @@
          </template>
       </b-modal>
     </div>
-    <ul v-for="data in treeData" id="tree">
+    <ul v-for="(data, index) in treeData" id="tree" :key="index">
       <tree-item
         class="item"
         :item="data"
@@ -85,47 +85,65 @@ export default {
       this.showModal = true
     },
     addItem: function (item) {
-      if (item.children == undefined) {
-        this.$set(item, 'children', [])
-      }
       switch (item.type) {
         case "op":
+          if (!item.merchants) {
+            this.$set(item, 'merchants', [])
+          }
           this.modalTitle = "加盟店登録"
           this.itemType = "mc"
           break;
         case "mc":
+          if (!item.stores) {
+            this.$set(item, 'stores', [])
+          }
           this.modalTitle = "設置店舗登録"
           this.itemType = "st"
           break;
-        case "st":
-          return
         default:
       }
       this.item = item
       this.showModal = true
     },
     add: function () {
-      var itemType = this.itemType
-      var itemNum = this.itemNum
-      var data = {
+      const itemType = this.itemType
+      const itemNum = this.itemNum
+      let data = {
         name: this.itemName, 
         id: this.itemId,
         type: this.itemType
       }
-      if (itemType === "op") {
-        this.treeData.push(data)
-      } else if (itemType === "st") {
-        data['children'] = [{name: itemNum, type: "tm"}]
-        this.item.children.push(data)
-      } else {
-        this.item.children.push(data)
+      switch (itemType) {
+        case "op":
+          this.treeData.push(data)
+          break;
+        case "mc":
+          this.item.merchants.push(data)
+          break;
+        case "st":
+          data["terminals"] = itemNum
+          this.item.stores.push(data)
+          break;
+        default:
       }
       this.clearItemName()
     },
+    
     clearItemName: function () {
       this.itemName = ''
       this.itemNum = ''
       this.itemId = ''
+    },
+    deleteType(item){
+      let vm = this
+      item.forEach(function(value) {
+        delete value.type
+        if (value.merchants) {
+          vm.deleteType(value.merchants)
+        } else if (value.stores) {
+          vm.deleteType(value.stores)
+        }
+      })
     }
   }
 }
