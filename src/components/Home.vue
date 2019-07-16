@@ -36,16 +36,22 @@
           </b-col>
           <b-col md="4">
             <div v-if="itemType === 'store'">
-              <b-form-group label="端末台数" label-for="number">
-                <b-form-textarea id="number" v-model="input.num" rows="20"></b-form-textarea>
+              <b-form-group label="端末台数" label-for="terminal">
+                <b-form-textarea id="terminal" v-model="input.terminal" rows="20"></b-form-textarea>
               </b-form-group>
             </div>
           </b-col>  
         </b-row>
         
+        <p v-if="errors.length">
+          <ul class="text-danger pl-0">
+            <li class="pb-0" v-for="(error,index) in errors" :key="index">{{ error }}</li>
+          </ul>
+        </p>
+        
          <template slot="modal-footer">
-           <b-button size="sm" @click="clearItem(), showModal=false">キャンセル</b-button>
-           <b-button size="sm" variant="primary" @click="add(), showModal=false">追加</b-button>
+           <b-button size="sm" @click="closeModal()">キャンセル</b-button>
+           <b-button size="sm" variant="primary" @click="add()">追加</b-button>
          </template>
          
       </b-modal>
@@ -78,58 +84,80 @@ export default {
       input: {
         id: '',
         name: '',
-        num: ''
+        terminal: ''
       },
       item: Object,
-      itemType: '' 
+      itemType: '',
+      disable: true,
+      errors: []
     }
   },
   methods: {
-    addOperator: function () {
+    addOperator () {
       this.modalTitle = "事業者登録"
-      this.itemType = 'enterprise'
-      this.showModal = true
+      this.itemType   = 'enterprise'
+      this.showModal  = true
     },
-    addItem: function (item) {
+    addItem (item) {
       switch (item.type) {
         case "enterprise":
           if (!item.merchants) {
             this.$set(item, 'merchants', [])
           }
           this.modalTitle = "加盟店登録"
-          this.itemType = "merchant"
+          this.itemType   = "merchant"
           break;
         case "merchant":
           if (!item.stores) {
             this.$set(item, 'stores', [])
           }
           this.modalTitle = "設置店舗登録"
-          this.itemType = "store"
+          this.itemType   = "store"
           break;
         default:
       }
       this.item = item
       this.showModal = true
     },
-    createData (namearr, idarr, type) {
+    createData (nameList, idList, type) {
       let data = []
-      const arr = this.isNew ? namearr : idarr
+      const arr = this.isNew ? nameList : idList
       for (let i = 0; i < arr.length; i++){
         data.push({
-          id: idarr[i] ? idarr[i] : null, 
-          name: namearr[i] ? namearr[i] : null,
+          id: idList[i] ? idList[i] : null, 
+          name: nameList[i] ? nameList[i] : null,
           type: type
         })
       }
       return data
     },
-    add: function () {
-      const namearr = this.input.name.split(/\r\n|\n/)
-      const idarr = this.input.id.split(/\r\n|\n/)
-      const numarr = this.input.num.split(/\r\n|\n/)
+    add () {
+      //textareaを改行で分解して配列に格納
+      const nameList = this.input.name.split(/\r\n|\n/)
+      const idList = this.input.id.split(/\r\n|\n/)
+      const terminalList = this.input.terminal.split(/\r\n|\n/)
       
-      let data = this.createData(namearr, idarr, this.itemType)
+      //validation
+      this.errors = [];
+      if (this.isNew && this.isIncludeNull(nameList)) {
+        this.errors.push("名称に空文字が含まれています")
+      }
+      if (!this.isNew && this.isIncludeNull(idList)) {
+        this.errors.push("IDに空文字が含まれています")
+      } else if (!this.isOnlyNumId(idList)) {
+        this.errors.push("IDは半角数字で入力してください")
+      }
+      if (this.itemType === "store" && !this.isOnlyNumId(terminalList)) {
+        this.errors.push("端末台数は半角数字で入力してください")
+      }
+      if (this.errors.length > 0) {
+        return
+      }
       
+      //追加するdataを作成
+      let data = this.createData(nameList, idList, this.itemType)
+      
+      //現在のtypeによって追加先のプロパティを切り分け
       switch (this.itemType) {
         case "enterprise":
           this.treeData = this.treeData.concat(data)
@@ -138,17 +166,24 @@ export default {
           this.item.merchants = this.item.merchants.concat(data)
           break;
         case "store":
-          for (let i = 0; i < data.length; i++){
-            data[i]["terminals"] = numarr[i] ? numarr[i] : null
+          for (let i = 0; i < data.length; i++) {
+            data[i]["terminals"] = terminalList[i] ? terminalList[i] : null
           }
           this.item.stores = this.item.stores.concat(data)
           break;
         default:
       }
-      this.clearItem()
+      this.closeModal()
     },
-    clearItem () {
-      this.input = { name: '', num: '', id: ''}
+    isIncludeNull (arr) {
+      return arr.includes("")
+    },
+    isOnlyNumId (arr) {
+      return arr.every(value => !isNaN(value))
+    },
+    closeModal () {
+      this.showModal = false
+      this.input = { id: '', name: '', terminal: ''}
     },
     deleteType (item) {
       let vm = this
