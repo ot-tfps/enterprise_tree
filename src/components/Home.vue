@@ -88,7 +88,6 @@ export default {
       },
       item: Object,
       itemType: '',
-      disable: true,
       errors: []
     }
   },
@@ -116,11 +115,11 @@ export default {
           break;
         default:
       }
-      this.item = item
+      this.item      = item
       this.showModal = true
     },
     createData (nameList, idList, type) {
-      let data = []
+      let data  = []
       const arr = this.isNew ? nameList : idList
       for (let i = 0; i < arr.length; i++){
         data.push({
@@ -133,12 +132,12 @@ export default {
     },
     add () {
       //textareaを改行で分解して配列に格納
-      const nameList = this.input.name.split(/\r\n|\n/)
-      const idList = this.input.id.split(/\r\n|\n/)
+      const nameList     = this.input.name.split(/\r\n|\n/)
+      const idList       = this.input.id.split(/\r\n|\n/)
       const terminalList = this.input.terminal.split(/\r\n|\n/)
       
       //validation
-      this.errors = [];
+      this.errors = []
       if (this.isNew && this.isIncludeNull(nameList)) {
         this.errors.push("名称に空文字が含まれています")
       }
@@ -147,7 +146,7 @@ export default {
       } else if (!this.isOnlyNumId(idList)) {
         this.errors.push("IDは半角数字で入力してください")
       }
-      if (this.itemType === "store" && !this.isOnlyNumId(terminalList)) {
+      if (this.itemType == "store" && !this.isOnlyNumId(terminalList)) {
         this.errors.push("端末台数は半角数字で入力してください")
       }
       if (this.errors.length > 0) {
@@ -183,7 +182,8 @@ export default {
     },
     closeModal () {
       this.showModal = false
-      this.input = { id: '', name: '', terminal: ''}
+      this.errors    = []
+      this.input     = { id: '', name: '', terminal: ''}
     },
     deleteType (item) {
       let vm = this
@@ -202,12 +202,25 @@ export default {
 
 <style>
 #tree {
-  width: 500px;
   background: #dadada;
   border-radius :8px;
   box-shadow :0px 0px 5px silver;
   padding: 0.5em 0.5em 0.5em 2em;
-  margin: auto;
+  margin: 30px 30px 0 30px;
   margin-top: 20px;
 }
+textarea {
+  background-image:
+    repeating-linear-gradient(
+      #fff,
+      #fff calc(1.5rem - 1px),
+      #ced4da calc(1.5rem - 1px),
+      #ced4da 1.5rem,
+      #fff 1.5rem
+    );
+  background-origin: content-box;
+  background-clip: content-box;
+  background-attachment: local;
+}
+
 </style>
