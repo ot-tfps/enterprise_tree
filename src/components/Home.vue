@@ -2,7 +2,7 @@
   <div>
     <div>
       
-      <b-row class="justify-content-center">
+      <b-row class="ml-3">
         <b-col sm="4" md="2">
           <b-button block @click="addOperator()">+ 事業者追加</b-button>
         </b-col>
@@ -49,10 +49,10 @@
           </ul>
         </p>
         
-         <template slot="modal-footer">
-           <b-button size="sm" @click="closeModal()">キャンセル</b-button>
-           <b-button size="sm" variant="primary" @click="add()">追加</b-button>
-         </template>
+        <template slot="modal-footer">
+          <b-button size="sm" @click="closeModal()">キャンセル</b-button>
+          <b-button size="sm" variant="primary" @click="add()">追加</b-button>
+        </template>
          
       </b-modal>
     </div>

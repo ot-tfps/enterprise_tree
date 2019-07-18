@@ -19,6 +19,9 @@ export default {
 /* Import Font Awesome Icons Set */
 $fa-font-path: '~font-awesome/fonts/';
 @import '~font-awesome/scss/font-awesome.scss';
+@import '~@fortawesome/fontawesome-free-webfonts/css/fontawesome.css';
+@import '~@fortawesome/fontawesome-free-webfonts/css/fa-regular.css';
+@import '~@fortawesome/fontawesome-free-webfonts/css/fa-solid.css';
 
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
