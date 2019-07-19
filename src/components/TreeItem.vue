@@ -1,15 +1,25 @@
 <template>
   <li class="tree-col">
-    <div :class="{bold: isFolder}" class="col-width">
+    <div :class="{bold: isFolder}" class="col-width" @mouseover="isHover=true" @mouseout="isHover=false">
       <i v-show="isFolder" @click="toggle" class="fas fa-fw" :class="caretClass" aria-hidden="true"></i>
       <i v-show="item.type=='enterprise'" class="fa fa-address-book fa-sm"></i>
       <i v-show="item.type=='merchant'" class="fa fa-institution fa-sm"></i>
       <i v-show="item.type=='store'" class="fa fa-building-o fa-sm"></i>
-      {{ item.id }} {{ item.id ? ':' : '' }} {{ item.name | truncate(10) }} 
-      <span v-show="item.terminals != undefined">{{'：' + item.terminals + '台'}}</span>
-      <i v-show="showAdd" class="fas fa-plus fa-fw" aria-hidden="true" @click="$emit('add-item', item)"></i>
-      <i class="fas fa-edit fa-fw"></i>
-      <i class="far fa-trash-alt fa-fw"></i>
+
+      <span v-if="!editableId" @click="editableId=true, setEditable()">{{ item.id }} {{ item.id ? ':' : '' }}</span>
+      <input v-else type="text" size="8" :value="item.id" ref="ref" @input="updateId" @blur="editableId=false" @keyup.enter="editableId=false">
+      
+      <span v-if="!editableName" @click="editableName=true, setEditable()">{{item.name | truncate(10)}}</span>
+      <input v-else type="text" :value="item.name" ref="ref" @input="updateName" @blur="editableName=false" @keyup.enter="editableName=false">
+
+      <span v-if="!editableTerminal" v-show="item.terminals" @click="editableTerminal=true, setEditable()">{{'：' + item.terminals + '台'}}</span>
+      <input v-else type="text" size="3" :value="item.terminals" ref="ref" @input="updateTerminal" @blur="editableTerminal=false" @keyup.enter="editableTerminal=false">
+
+      <span v-show="isHover">
+        <i class="far fa-trash-alt fa-fw" @click="deleteItem(item)"></i>
+      </span>
+      
+      <b-button v-if="showAdd" variant="outline-secondary" class="d-block" size="sm" @click="$emit('add-item', item)">{{addName}}を追加する</b-button>
     </div>
     <ul v-show="isOpen">
       <tree-item
@@ -33,7 +43,11 @@ export default {
   },
   data: () => {
     return {
-      isOpen: true
+      isOpen: true,
+      isHover: false,
+      editableId: false,
+      editableName: false,
+      editableTerminal: false,
     }
   },
   computed: {
@@ -49,6 +63,9 @@ export default {
     },
     caretClass () {
       return this.isOpen ? 'fa-caret-down' : 'fa-caret-right'
+    },
+    addName () {
+      return this.item.type == "enterprise" ? "加盟店" : "設置店舗"
     }
   },
   filters: {
@@ -61,10 +78,29 @@ export default {
     } 
   },
   methods: {
-    toggle: function () {
+    toggle () {
       if (this.isFolder) {
         this.isOpen = !this.isOpen
       }
+    },
+    updateId (e) {
+      if (e.target.value && !isNaN(e.target.value)) {
+        this.item.id = e.target.value
+      }
+    },
+    updateName (e) {
+      if (e.target.value) {
+        this.item.name = e.target.value
+      }
+    },
+    updateTerminal (e) {
+      if (!isNaN(e.target.value)) {
+        this.item.terminals = e.target.value
+      }
+    },
+    setEditable () {
+      this.$nextTick(() => this.$refs.ref.focus())
+    },
     deleteItem () {
       const data = [this.$parent, this.item]
       this.$emit('delete-item', data)
