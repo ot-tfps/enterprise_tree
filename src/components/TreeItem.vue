@@ -18,7 +18,8 @@
         :key="index"
         :item="merchant"
         @click="toggle"
-        @add-item="$emit('add-item', $event)">
+        @add-item="$emit('add-item', $event)"
+        @delete-item="$emit('delete-item', $event)">
       </tree-item>
     </ul>
   </li>
@@ -64,6 +65,9 @@ export default {
       if (this.isFolder) {
         this.isOpen = !this.isOpen
       }
+    deleteItem () {
+      const data = [this.$parent, this.item]
+      this.$emit('delete-item', data)
     }
   }
 }

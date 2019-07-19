@@ -40,7 +40,7 @@
                 <b-form-textarea id="terminal" v-model="input.terminal" rows="20"></b-form-textarea>
               </b-form-group>
             </div>
-          </b-col>  
+          </b-col>
         </b-row>
         
         <p v-if="errors.length">
@@ -57,13 +57,23 @@
       </b-modal>
     </div>
     
-    <ul v-for="(data, index) in treeData" id="tree" :key="index">
+    <ul v-for="(data, index) in item" id="tree" :key="index">
       <tree-item
         class="item"
         :item="data"
-        @add-item="addItem">
+        @add-item="addItem"
+        @delete-item="deleteItem">
       </tree-item>
     </ul>
+
+    <div class="card w-25 mr-auto ml-auto mt-5">
+      <div class="card-header">
+        <span>json</span>
+      </div>
+      <div class="card-body p-2">
+        {{jsonToShow}}
+      </div>
+    </div>
     
   </div>
 </template>
@@ -78,7 +88,6 @@ export default {
   data: () => {
     return {
       showModal: false,
-      treeData: sampleData,
       modalTitle: '',
       isNew: true,
       input: {
@@ -86,16 +95,44 @@ export default {
         name: '',
         terminal: ''
       },
-      item: Object,
+      item: sampleData,
+      tempItem: Object,
       itemType: '',
       errors: []
     }
+  },
+  computed: {
+    jsonToShow() { return JSON.stringify(this.item, null, 4) }
   },
   methods: {
     addOperator () {
       this.modalTitle = "事業者登録"
       this.itemType   = 'enterprise'
       this.showModal  = true
+    },
+    deleteItem (data) {
+      const parent = data[0]
+      const child  = data[1]
+      let parentItem
+      
+      switch (child.type) {
+        case "enterprise":
+          parentItem = parent.item
+          break;
+        case "merchant":
+          parentItem = parent.item["merchants"]
+          break;
+        case "store":
+          parentItem = parent.item["stores"]
+          break;
+        default:
+      }
+      for (var i = 0, len = parentItem.length; i < len; i++) {
+        if (parentItem[i] === child) {
+          parentItem.splice(i, 1)
+          break
+        }
+      }
     },
     addItem (item) {
       switch (item.type) {
@@ -115,7 +152,7 @@ export default {
           break;
         default:
       }
-      this.item      = item
+      this.tempItem  = item
       this.showModal = true
     },
     createData (nameList, idList, type) {
@@ -156,19 +193,19 @@ export default {
       //追加するdataを作成
       let data = this.createData(nameList, idList, this.itemType)
       
-      //現在のtypeによって追加先のプロパティを切り分け
+      //typeによって追加先のプロパティを切り分け
       switch (this.itemType) {
         case "enterprise":
-          this.treeData = this.treeData.concat(data)
+          this.item = this.item.concat(data)
           break;
         case "merchant":
-          this.item.merchants = this.item.merchants.concat(data)
+          this.tempItem.merchants = this.tempItem.merchants.concat(data)
           break;
         case "store":
           for (let i = 0; i < data.length; i++) {
             data[i]["terminals"] = terminalList[i] ? terminalList[i] : null
           }
-          this.item.stores = this.item.stores.concat(data)
+          this.tempItem.stores = this.tempItem.stores.concat(data)
           break;
         default:
       }
