@@ -11,7 +11,7 @@
         </b-col>
       </b-row>
       
-      <b-modal size="xl" v-model="showModal">
+      <b-modal size="xl" v-model="showModal" @show="resetModal">
         <template slot="modal-title">{{ modalTitle }}</template>
         <b-form-radio-group
           :plain="true"
@@ -50,10 +50,14 @@
         </p>
         
         <template slot="modal-footer">
-          <b-button size="sm" @click="closeModal()">キャンセル</b-button>
+          <b-button size="sm" @click="showModal=false">キャンセル</b-button>
           <b-button size="sm" variant="primary" @click="add()">追加</b-button>
         </template>
          
+      </b-modal>
+      
+      <b-modal size="sm" v-model="deleteModal" hide-header @ok="deleteTrue">
+        <p class="my-4">削除してよろしいですか？</p>
       </b-modal>
     </div>
     
@@ -61,8 +65,8 @@
       <tree-item
         class="item"
         :item="data"
-        @add-item="addItem"
-        @delete-item="deleteItem">
+        @add-button-clicked="addItem"
+        @delete-button-clicked="showDeleteModal">
       </tree-item>
     </ul>
 
@@ -88,8 +92,10 @@ export default {
   data: () => {
     return {
       showModal: false,
-      modalTitle: '',
+      deleteModal: false,
       isNew: true,
+      modalTitle: '',
+      itemType: '',
       input: {
         id: '',
         name: '',
@@ -97,8 +103,8 @@ export default {
       },
       item: sampleData,
       tempItem: Object,
-      itemType: '',
-      errors: []
+      errors: [],
+      deleteData: []
     }
   },
   computed: {
@@ -110,9 +116,16 @@ export default {
       this.itemType   = 'enterprise'
       this.showModal  = true
     },
-    deleteItem (data) {
-      const parent = data[0]
-      const child  = data[1]
+    deleteTrue() {
+      this.deleteItem()
+    },
+    showDeleteModal (data) {
+      this.deleteModal = true
+      this.deleteData = data
+    },
+    deleteItem () {
+      const parent = this.deleteData[0]
+      const child  = this.deleteData[1]
       let parentItem
       
       switch (child.type) {
@@ -209,7 +222,7 @@ export default {
           break;
         default:
       }
-      this.closeModal()
+      this.showModal = false
     },
     isIncludeNull (arr) {
       return arr.includes("")
@@ -217,8 +230,7 @@ export default {
     isOnlyNumId (arr) {
       return arr.every(value => !isNaN(value))
     },
-    closeModal () {
-      this.showModal = false
+    resetModal () {
       this.errors    = []
       this.input     = { id: '', name: '', terminal: ''}
     },

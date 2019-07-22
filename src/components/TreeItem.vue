@@ -2,16 +2,20 @@
   <li class="tree-col">
     <div :class="{bold: isFolder}" class="col-width" @mouseover="isHover=true" @mouseout="isHover=false">
       <i v-show="isFolder" @click="toggle" class="fas fa-fw" :class="caretClass" aria-hidden="true"></i>
-      <i v-show="item.type=='enterprise'" class="fa fa-address-book fa-sm"></i>
-      <i v-show="item.type=='merchant'" class="fa fa-institution fa-sm"></i>
-      <i v-show="item.type=='store'" class="fa fa-building-o fa-sm"></i>
+      <i v-show="item.type=='enterprise'" class="far fa-building fa-fw"></i>
+      <i v-show="item.type=='merchant'" class="fas fa-store-alt fa-fw"></i>
+      <i v-show="item.type=='store'" class="fas fa-tablet-alt fa-fw"></i>
 
-      <span v-if="!editableId" @click="editableId=true, setEditable()">{{ item.id }} {{ item.id ? ':' : '' }}</span>
-      <input v-else type="text" size="8" :value="item.id" ref="ref" @input="updateId" @blur="editableId=false" @keyup.enter="editableId=false">
+      <div v-if="item.id" class="d-inline">
+        <span v-if="!editableId" @click="editableId=true, setEditable()">{{ item.id }} </span>
+        <input v-else type="text" size="8" :value="item.id" ref="ref" @input="updateId" @blur="editableId=false" @keyup.enter="editableId=false">
+      </div>
       
-      <span v-if="!editableName" @click="editableName=true, setEditable()">{{item.name | truncate(10)}}</span>
-      <input v-else type="text" :value="item.name" ref="ref" @input="updateName" @blur="editableName=false" @keyup.enter="editableName=false">
-
+      <div v-if="item.name" class="d-inline">
+        <span v-if="!editableName" @click="editableName=true, setEditable()">{{item.name | truncate(10)}}</span>
+        <input v-else type="text" :value="item.name" ref="ref" @input="updateName" @blur="editableName=false" @keyup.enter="editableName=false">
+      </div>
+      
       <span v-if="!editableTerminal" v-show="item.terminals" @click="editableTerminal=true, setEditable()">{{'：' + item.terminals + '台'}}</span>
       <input v-else type="text" size="3" :value="item.terminals" ref="ref" @input="updateTerminal" @blur="editableTerminal=false" @keyup.enter="editableTerminal=false">
 
@@ -19,7 +23,7 @@
         <i class="far fa-trash-alt fa-fw" @click="deleteItem(item)"></i>
       </span>
       
-      <b-button v-if="showAdd" variant="outline-secondary" class="d-block" size="sm" @click="$emit('add-item', item)">{{addName}}を追加する</b-button>
+      <b-button v-if="showAdd" variant="outline-secondary" class="d-block mb-2" size="sm" @click="$emit('add-button-clicked', item)">{{addName}}を追加する</b-button>
     </div>
     <ul v-show="isOpen">
       <tree-item
@@ -28,8 +32,8 @@
         :key="index"
         :item="merchant"
         @click="toggle"
-        @add-item="$emit('add-item', $event)"
-        @delete-item="$emit('delete-item', $event)">
+        @add-button-clicked="$emit('add-button-clicked', $event)"
+        @delete-button-clicked="$emit('delete-button-clicked', $event)">
       </tree-item>
     </ul>
   </li>
@@ -89,7 +93,9 @@ export default {
       }
     },
     updateName (e) {
-      if (e.target.value) {
+      if (this.item.id) {
+        this.item.name = e.target.value
+      } else if (e.target.value) {
         this.item.name = e.target.value
       }
     },
@@ -103,7 +109,7 @@ export default {
     },
     deleteItem () {
       const data = [this.$parent, this.item]
-      this.$emit('delete-item', data)
+      this.$emit('delete-button-clicked', data)
     }
   }
 }
