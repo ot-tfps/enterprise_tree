@@ -185,7 +185,7 @@ export default {
       const arr = this.isNew ? nameList : idList
       for (let i = 0; i < arr.length; i++){
         data.push({
-          id: idList[i] ? idList[i] : null, 
+          id: !this.isNew ? idList[i] : null, 
           name: nameList[i] ? nameList[i] : null,
           type: type
         })
@@ -202,16 +202,20 @@ export default {
       const idList       = this.input.id.split(/\r\n|\n/)
       const terminalList = this.input.terminal.split(/\r\n|\n/)
       //validation
+      //name
       this.errors = []
       if (this.isNew && this.isIncludeNull(nameList)) {
         this.errors.push("名称に空文字が含まれています")
       }
+      //id
       if (!this.isNew && this.isIncludeNull(idList)) {
         this.errors.push("IDに空文字が含まれています")
-      } else if (!this.isOnlyNumId(idList)) {
+      }
+      if (!this.isNew && !this.isOnlyNum(idList)) {
         this.errors.push("IDは半角数字で入力してください")
       }
-      if (this.itemType == "store" && !this.isOnlyNumId(terminalList)) {
+      //terminal
+      if (this.itemType == "store" && !this.isOnlyNum(terminalList)) {
         this.errors.push("端末台数は半角数字で入力してください")
       }
       if (this.errors.length > 0) {
@@ -225,7 +229,7 @@ export default {
       this.requestAnimation(() => {
         //input dataをtree itemに追加
         self.addItem(data)
-        self.loading = false
+        self.loading   = false
         self.showModal = false
       })
     },
@@ -247,7 +251,7 @@ export default {
     isIncludeNull (arr) {
       return arr.includes("")
     },
-    isOnlyNumId (arr) {
+    isOnlyNum (arr) {
       return arr.every(value => !isNaN(value))
     },
     resetModal () {
