@@ -101,7 +101,7 @@ export default {
       showModal: false,
       deleteModal: false,
       isNew: true,
-      loading: true,
+      loading: false,
       showJson: false,
       modalTitle: '',
       itemType: '',
