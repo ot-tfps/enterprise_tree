@@ -7,12 +7,38 @@
           <b-button block @click="addOperator()">+ 事業者追加</b-button>
         </b-col>
         <b-col sm="4" md="2">
-          <b-button block>作成</b-button>
+          <b-button block @click="sendJson()">作成</b-button>
         </b-col>
       </b-row>
       
+      <ul v-for="(data, index) in item" class="tree" :key="index">
+        <tree-item
+          class="item"
+          :item="data"
+          @add-button-clicked="showAddModal"
+          @delete-button-clicked="showDeleteModal">
+        </tree-item>
+      </ul>
+      
+      <b-modal v-model="showJson" hide-footer @hidden="clear">
+        <div class="card mr-auto ml-auto">
+          <div class="card-header">
+            <span>json</span>
+          </div>
+          <div class="card-body p-2">
+            {{jsonToSend}}
+          </div>
+        </div>
+      </b-modal>
+      
       <b-modal size="xl" v-model="showModal" @show="resetModal">
         <template slot="modal-title">{{ modalTitle }}</template>
+        <div class="ye"></div>
+        
+        <div class="text-center loading" v-if="loading">
+          <b-spinner style="width: 4rem; height: 4rem;" label="Text Centered"></b-spinner>
+        </div>
+        
         <b-form-radio-group
           :plain="true"
           :options="[
@@ -35,7 +61,7 @@
             </b-form-group>
           </b-col>
           <b-col md="4">
-            <div v-if="itemType === 'store'">
+            <div v-show="itemType === 'store'">
               <b-form-group label="端末台数" label-for="terminal">
                 <b-form-textarea id="terminal" v-model="input.terminal" rows="20"></b-form-textarea>
               </b-form-group>
@@ -43,7 +69,7 @@
           </b-col>
         </b-row>
         
-        <p v-if="errors.length">
+        <p v-show="errors.length">
           <ul class="text-danger pl-0">
             <li class="pb-0" v-for="(error,index) in errors" :key="index">{{ error }}</li>
           </ul>
@@ -51,34 +77,15 @@
         
         <template slot="modal-footer">
           <b-button size="sm" @click="showModal=false">キャンセル</b-button>
-          <b-button size="sm" variant="primary" @click="add()">追加</b-button>
+          <b-button size="sm" variant="primary" @click="addButtonClicked">追加</b-button>
         </template>
-         
       </b-modal>
       
       <b-modal size="sm" v-model="deleteModal" hide-header @ok="deleteTrue">
         <p class="my-4">削除してよろしいですか？</p>
       </b-modal>
+      
     </div>
-    
-    <ul v-for="(data, index) in item" id="tree" :key="index">
-      <tree-item
-        class="item"
-        :item="data"
-        @add-button-clicked="addItem"
-        @delete-button-clicked="showDeleteModal">
-      </tree-item>
-    </ul>
-
-    <div class="card w-25 mr-auto ml-auto mt-5">
-      <div class="card-header">
-        <span>json</span>
-      </div>
-      <div class="card-body p-2">
-        {{jsonToShow}}
-      </div>
-    </div>
-    
   </div>
 </template>
 
@@ -94,6 +101,8 @@ export default {
       showModal: false,
       deleteModal: false,
       isNew: true,
+      loading: true,
+      showJson: false,
       modalTitle: '',
       itemType: '',
       input: {
@@ -104,11 +113,9 @@ export default {
       item: sampleData,
       tempItem: Object,
       errors: [],
-      deleteData: []
+      deleteData: [],
+      jsonToSend: []
     }
-  },
-  computed: {
-    jsonToShow() { return JSON.stringify(this.item, null, 4) }
   },
   methods: {
     addOperator () {
@@ -147,7 +154,7 @@ export default {
         }
       }
     },
-    addItem (item) {
+    showAddModal (item) {
       switch (item.type) {
         case "enterprise":
           if (!item.merchants) {
@@ -180,7 +187,21 @@ export default {
       }
       return data
     },
-    add () {
+    requestAnimation (callback) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(callback)
+      })
+    },
+    addButtonClicked () {
+      var self = this
+      this.loading = true
+      this.requestAnimation(() => {
+        self.addItem()
+        self.loading = false
+        self.showModal = false
+      })
+    },
+    addItem () {
       //textareaを改行で分解して配列に格納
       const nameList     = this.input.name.split(/\r\n|\n/)
       const idList       = this.input.id.split(/\r\n|\n/)
@@ -222,7 +243,6 @@ export default {
           break;
         default:
       }
-      this.showModal = false
     },
     isIncludeNull (arr) {
       return arr.includes("")
@@ -244,13 +264,22 @@ export default {
           vm.deleteType(value.stores)
         }
       })
+      return item
+    },
+    sendJson () {
+      const jsonToSend = this.deleteType(this.item)
+      this.jsonToSend  = jsonToSend
+      this.showJson    = true
+    },
+    clear () {
+      this.item = []
     }
   }
 }
 </script>
 
 <style>
-#tree {
+.tree {
   background: #dadada;
   border-radius :8px;
   box-shadow :0px 0px 5px silver;
@@ -258,7 +287,13 @@ export default {
   margin: 30px 30px 0 30px;
   margin-top: 20px;
 }
-textarea {
+.loading{
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  top: 40%;
+}
+/* textarea {
   background-image:
     repeating-linear-gradient(
       #fff,
@@ -270,6 +305,6 @@ textarea {
   background-origin: content-box;
   background-clip: content-box;
   background-attachment: local;
-}
+} */
 
 </style>
