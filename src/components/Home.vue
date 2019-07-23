@@ -147,7 +147,7 @@ export default {
           break;
         default:
       }
-      for (var i = 0, len = parentItem.length; i < len; i++) {
+      for (let i = 0, len = parentItem.length; i < len; i++) {
         if (parentItem[i] === child) {
           parentItem.splice(i, 1)
           break
@@ -196,7 +196,6 @@ export default {
       return data
     },
     addButtonClicked () {
-      var self = this
       //textareaを改行で分解して配列に格納
       const nameList     = this.input.name.split(/\r\n|\n/)
       const idList       = this.input.id.split(/\r\n|\n/)
@@ -224,6 +223,7 @@ export default {
       //追加するdataを作成
       let data = this.createData(nameList, idList, terminalList, this.itemType)
       // loading開始
+      const self = this
       this.loading = true
       // loading animationが開始されてから後続処理実行
       this.requestAnimation(() => {
