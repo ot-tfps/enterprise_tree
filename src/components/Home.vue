@@ -175,7 +175,12 @@ export default {
       this.tempItem  = item
       this.showModal = true
     },
-    createData (nameList, idList, type) {
+    requestAnimation (callback) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(callback)
+      })
+    },
+    createData (nameList, idList, terminalList, type) {
       let data  = []
       const arr = this.isNew ? nameList : idList
       for (let i = 0; i < arr.length; i++){
@@ -184,29 +189,18 @@ export default {
           name: nameList[i] ? nameList[i] : null,
           type: type
         })
+        if (this.itemType == "store") {
+          data[i]["terminals"] = terminalList[i] ? terminalList[i] : 0
+        }
       }
       return data
     },
-    requestAnimation (callback) {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(callback)
-      })
-    },
     addButtonClicked () {
       var self = this
-      this.loading = true
-      this.requestAnimation(() => {
-        self.addItem()
-        self.loading = false
-        self.showModal = false
-      })
-    },
-    addItem () {
       //textareaを改行で分解して配列に格納
       const nameList     = this.input.name.split(/\r\n|\n/)
       const idList       = this.input.id.split(/\r\n|\n/)
       const terminalList = this.input.terminal.split(/\r\n|\n/)
-      
       //validation
       this.errors = []
       if (this.isNew && this.isIncludeNull(nameList)) {
@@ -223,10 +217,19 @@ export default {
       if (this.errors.length > 0) {
         return
       }
-      
       //追加するdataを作成
-      let data = this.createData(nameList, idList, this.itemType)
-      
+      let data = this.createData(nameList, idList, terminalList, this.itemType)
+      // loading開始
+      this.loading = true
+      // loading animationが開始されてから後続処理実行
+      this.requestAnimation(() => {
+        //input dataをtree itemに追加
+        self.addItem(data)
+        self.loading = false
+        self.showModal = false
+      })
+    },
+    addItem (data) {
       //typeによって追加先のプロパティを切り分け
       switch (this.itemType) {
         case "enterprise":
@@ -236,9 +239,6 @@ export default {
           this.tempItem.merchants = this.tempItem.merchants.concat(data)
           break;
         case "store":
-          for (let i = 0; i < data.length; i++) {
-            data[i]["terminals"] = terminalList[i] ? terminalList[i] : 0
-          }
           this.tempItem.stores = this.tempItem.stores.concat(data)
           break;
         default:
