@@ -6,12 +6,12 @@
       <i v-show="item.type=='merchant'" class="fas fa-store-alt fa-fw"></i>
       <i v-show="item.type=='store'" class="fas fa-tablet-alt fa-fw"></i>
 
-      <div v-show="item.id" class="d-inline">
+      <div v-if="item.id" class="d-inline">
         <span v-if="!editableId" @click="editableId=true, setEditable()">{{ item.id }} </span>
         <input v-else type="text" size="8" :value="item.id" ref="ref" @input="updateId" @blur="editableId=false" @keyup.enter="editableId=false">
       </div>
       
-      <div v-show="item.name" class="d-inline">
+      <div v-if="item.name" class="d-inline">
         <span v-if="!editableName" @click="editableName=true, setEditable()">{{item.name | truncate(10)}}</span>
         <input v-else type="text" :value="item.name" ref="ref" @input="updateName" @blur="editableName=false" @keyup.enter="editableName=false">
       </div>
