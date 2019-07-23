@@ -216,7 +216,7 @@ export default {
           break;
         case "store":
           for (let i = 0; i < data.length; i++) {
-            data[i]["terminals"] = terminalList[i] ? terminalList[i] : null
+            data[i]["terminals"] = terminalList[i] ? terminalList[i] : 0
           }
           this.tempItem.stores = this.tempItem.stores.concat(data)
           break;

@@ -6,17 +6,17 @@
       <i v-show="item.type=='merchant'" class="fas fa-store-alt fa-fw"></i>
       <i v-show="item.type=='store'" class="fas fa-tablet-alt fa-fw"></i>
 
-      <div v-if="item.id" class="d-inline">
+      <div v-show="item.id" class="d-inline">
         <span v-if="!editableId" @click="editableId=true, setEditable()">{{ item.id }} </span>
         <input v-else type="text" size="8" :value="item.id" ref="ref" @input="updateId" @blur="editableId=false" @keyup.enter="editableId=false">
       </div>
       
-      <div v-if="item.name" class="d-inline">
+      <div v-show="item.name" class="d-inline">
         <span v-if="!editableName" @click="editableName=true, setEditable()">{{item.name | truncate(10)}}</span>
         <input v-else type="text" :value="item.name" ref="ref" @input="updateName" @blur="editableName=false" @keyup.enter="editableName=false">
       </div>
       
-      <span v-if="!editableTerminal" v-show="item.terminals" @click="editableTerminal=true, setEditable()">{{'：' + item.terminals + '台'}}</span>
+      <span v-if="!editableTerminal" @click="editableTerminal=true, setEditable()">： {{item.terminals!=null?item.terminals:0}}台</span>
       <input v-else type="text" size="3" :value="item.terminals" ref="ref" @input="updateTerminal" @blur="editableTerminal=false" @keyup.enter="editableTerminal=false">
 
       <span v-show="isHover">
@@ -100,7 +100,9 @@ export default {
       }
     },
     updateTerminal (e) {
-      if (!isNaN(e.target.value)) {
+      if (!e.target.value) {
+        this.item.terminals = 0
+      } else if (!isNaN(e.target.value)) {
         this.item.terminals = e.target.value
       }
     },
