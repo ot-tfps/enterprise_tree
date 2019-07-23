@@ -16,7 +16,7 @@
         <input v-else type="text" :value="item.name" ref="ref" @input="updateName" @blur="editableName=false" @keyup.enter="editableName=false">
       </div>
       
-      <span v-if="!editableTerminal" @click="editableTerminal=true, setEditable()">： {{item.terminals!=null?item.terminals:0}}台</span>
+      <span v-if="!editableTerminal" v-show="item.terminals!=undefined" @click="editableTerminal=true, setEditable()">： {{item.terminals!=null?item.terminals:0}}台</span>
       <input v-else type="text" size="3" :value="item.terminals" ref="ref" @input="updateTerminal" @blur="editableTerminal=false" @keyup.enter="editableTerminal=false">
 
       <span v-show="isHover">
